@@ -12,6 +12,7 @@ class QueueWithMax
   attr_accessor :store
 
   def initialize
+    
   end
 
   def enqueue(val)
