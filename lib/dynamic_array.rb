@@ -11,7 +11,7 @@ class DynamicArray
 
   # O(1)
   def [](index)
-    p "idx:#{index} length: #{@length}"
+    # p "idx:#{index} length: #{@length}"
     raise "index out of bounds" if index >= @length 
     @store[index]
   end

@@ -4,57 +4,64 @@ class RingBuffer
   attr_reader :length
 
   def initialize
-    @store = []
     @length = 0
     @start_idx = 0
     @capacity = 8
+    @store = StaticArray.new(@capacity)
   end
 
-  def peek
-    @store[@length - 1]
-  end 
 
   # O(1)
   def [](index)
-    raise "index out of bounds" if index >= length
-    @store[@start_idx % capacity + index]
+    # raise "index out of bounds" if index >= length || index < 0
+    # p self[6]
+    converted_idx = (@start_idx + index) % capacity
+    p "#{@start_idx} #{index} #{capacity}, converted: #{converted_idx}, val: #{@store[converted_idx]}"
+    # p @store[6]
+    @store[converted_idx]
   end
 
   # O(1)
   def []=(index, val)
+    # converted_idx = (@start_idx % @capacity)
+    # p "index #{index} is equal to index #{converted_idx}"
+    converted_idx = (@start_idx + index) % capacity
+    # p "setting #{converted_idx} to #{val}"
+    @store[converted_idx] = val
+    # p "check: #{self[index]}"
   end
 
   # O(1)
   def pop
-    if @length > 0
-      val = @store[@length - 1]
-      @length -= 1
-    end 
-    val 
+    # val = 
+    @length -= 1
   end
 
   # O(1) ammortized
   def push(val)
     @length += 1
-    p "start: #{@start_idx}"
-    p "pushing to idx: #{@start_idx + @length}"
-
-    @store[@start_idx + @length - 1] = val
+    last_idx = @length - 1
+    self[last_idx] = val
   end
 
   # O(1)
   def shift
-    val = @store[@start_idx % @capacity]
-    @length -= 1
+    val = self[0]
     @start_idx += 1
+    @length -= 1
+    # p "shifted #{val}"
     val 
   end
 
   # O(1) ammortized
   def unshift(val)
+    # first_idx = @start_idx
     @start_idx -= 1
     @length += 1
-    @store[@start_idx % @capacity] = val
+    # p first_idx
+    p "unshifting #{val}"
+    self[0] = val
+    p "the first index is now: #{self[0]}"
   end
 
   protected
@@ -69,12 +76,3 @@ class RingBuffer
 end
 
 arr = RingBuffer.new
-
-4.times do |i|
-  arr.push(i)
-  p "push: #{i}, #{arr.peek}"
-  arr.unshift(i)
-  p "unshift: #{i}, #{arr[0]}"
-  # p "store: #{arr.store}"
-end
-
