@@ -5,49 +5,67 @@ class DynamicArray
 
   def initialize
     @length = 0
-    @store = []
     @capacity = 8
+    @store = StaticArray.new(@capacity)
   end
 
   # O(1)
   def [](index)
-    raise "index out of bounds" if index >= @length
+    p "idx:#{index} length: #{@length}"
+    raise "index out of bounds" if index >= @length 
     @store[index]
   end
 
   # O(1)
   def []=(index, value)
+    raise "index out of bounds" if index >= @length || index < 0
     @store[index] = value
   end
 
   # O(1)
   def pop
-    raise "index out of bounds" if @store.empty?
+    # raise "idnex out of bounds" if @length == 0
+    val = self[@length-1]
     @length -= 1
-    @store.pop
+    val 
   end
 
   # O(1) ammortized; O(n) worst case. Variable because of the possible
   # resize.
   def push(val)
     @length += 1
-    resize! if @length > capacity
-    @store << val
+    resize! if @length > @capacity
+    self[@length-1] = val
     # @capacity += 1
   end
 
   # O(n): has to shift over all the elements.
+  #move every element left 
   def shift
-    raise "index out of bounds" if @store.empty?
-
+    # return nil if @length < 1
+    val = self[0]
+    new_arr = DynamicArray.new 
+    i = 1
+    while i < @length do 
+      new_arr.push(self[i])
+      i += 1
+    end 
+    @store = new_arr
     @length -= 1
-    @store.shift 
+    val 
   end
 
   # O(n): has to shift over all the elements.
   def unshift(val)
     @length += 1
-    @store.unshift(val)
+    i = 0
+    new_arr = DynamicArray.new
+    new_arr.push(val)
+    while i < @length do 
+      new_arr.push(@store[i])
+      i += 1
+    end 
+    @store = new_arr
   end
 
   protected
@@ -59,10 +77,19 @@ class DynamicArray
 
   # O(n): has to copy over all the elements to the new store.
   def resize!
+    # raise "resize not implemented"
     # @temp_store = []
     # @store.each do |el|
       
     # end 
-    @capacity = @capacity * 2 
+    # @capacity = @capacity * /2 
+    @capacity = @capacity * 2
+    new_store = StaticArray.new(@capacity)
+    i = 0
+    while i < @length 
+      new_store[i] = @store[i]
+      i += 1
+    end 
+    @store = new_store 
   end
 end
